@@ -983,13 +983,13 @@ def mp_run_test_module(test_tasks: mp.Queue, ret_queue: mp.Queue, abort_queue: m
         return
 
 
-def handle_test_completion(ret_queue: mp.Queue, abort_queue: mp.Queue, failure_messages, continue_on_error):
+def handle_test_completion(ret_queue: mp.Queue, abort_queue: mp.Queue, failure_messages, continue_through_error):
     test, err_message = ret_queue.get()
     print_log_file(test)
     if err_message is None:
         return True
     failure_messages.append(err_message)
-    if not continue_on_error:
+    if not continue_through_error:
         abort_queue.put_nowait("stop")
         raise RuntimeError(err_message)
     print_to_stderr(err_message)
@@ -1037,7 +1037,7 @@ def main():
             procs.append(p)
 
         for i in range(len(selected_tests_parallel)):
-            handle_test_completion(ret_queue, abort_queue, failure_messages, options.continue_on_error)
+            handle_test_completion(ret_queue, abort_queue, failure_messages, options.continue_through_error)
 
         del os.environ['PARALLEL_TESTING']
 
@@ -1057,7 +1057,7 @@ def main():
         for p in procs:
             p.join()
         while not ret_queue.empty():
-            handle_test_completion(ret_queue, abort_queue, failure_messages, options.continue_on_error)
+            handle_test_completion(ret_queue, abort_queue, failure_messages, options.continue_through_error)
 
         if options.coverage:
             from coverage import Coverage
