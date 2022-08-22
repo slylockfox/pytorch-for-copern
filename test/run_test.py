@@ -1033,6 +1033,7 @@ def main():
         for i in range(proc_limit):
             p = mp.Process(target=mp_run_test_module, args=(
                 test_tasks, ret_queue, abort_queue, test_directory, copy.deepcopy(options)))
+            p.start()
             procs.append(p)
 
         for i in range(len(selected_tests_parallel)):
