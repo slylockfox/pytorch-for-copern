@@ -3069,6 +3069,20 @@ def sample_inputs_conv2d(op_info, device, dtype, requires_grad, jit_fail_sample=
             make_arg(bias) if bias is not None else bias
         ), kwargs=kwargs)
 
+    # Test mixed dtypes
+
+    # (int, int, X)
+    weight = torch.randint(high=10, size=(3, 2, 3, 3), device=device)
+    input = torch.randint(high=10, size=(2, 4, 4), device=device)
+    bias = make_arg((3,))
+    yield SampleInput(input, args=(weight, bias))
+
+    # (float, float, X)
+    weight = torch.rand(size=(3, 2, 3, 3), device=device, requires_grad=requires_grad, dtype=torch.float64)
+    input = torch.rand(size=(2, 4, 4), device=device, requires_grad=requires_grad, dtype=torch.float64)
+    bias = make_arg((3,))
+    yield SampleInput(input, args=(weight, bias))
+
 
 def sample_inputs_group_norm(opinfo, device, dtype, requires_grad, **kwargs):
     make_arg = partial(make_tensor, device=device, dtype=dtype, requires_grad=requires_grad)
