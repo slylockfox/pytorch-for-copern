@@ -227,15 +227,16 @@ Tensor multinomial_batching_rule(const Tensor& self, const int64_t num_samples, 
     shapeVec.insert(shapeVec.end(), shape.begin(), shape.end());
     self_value = self_value.expand(shapeVec);
   }
-  if (self_value.dim() == 3 && (self_bdim || randomness == RandomnessType::Different)) {
+  const auto orig_input_dim = self_value.dim();
+  if (orig_input_dim == 3 && (self_bdim || randomness == RandomnessType::Different)) {
     self_value = reshape_dim_into(1, 0, self_value);
   }
   auto out = multinomial(self_value, num_samples, replacement, generator);
   if (randomness == RandomnessType::Same && !self_bdim) {
     return out;
   }
-  if(self_value.dim() == 3 && self_bdim) {
-    out = out.reshape(self.sizes());
+  if(orig_input_dim == 3) {  // don't need other conditions since multinomial would have errored if they weren't met
+    out = reshape_dim_outof(0, maybe_layer->batchSize(), out);
   }
   return makeBatched(out, 0, cur_level);
 }
