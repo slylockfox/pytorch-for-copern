@@ -86,7 +86,7 @@ class C10_API intrusive_ptr_target {
 #pragma GCC diagnostic pop
   }
 
-  constexpr intrusive_ptr_target() noexcept : refcount_(0), weakcount_(0) {}
+  /* MJS: was constexpr */ intrusive_ptr_target() noexcept : refcount_(0), weakcount_(0) {}
 
   // intrusive_ptr_target supports copy and move: but refcount and weakcount don't
   // participate (since they are intrinsic properties of the memory location)
